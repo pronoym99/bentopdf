@@ -207,7 +207,7 @@ async function flattenPdf() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -263,4 +263,6 @@ document.addEventListener('DOMContentLoaded', function () {
       resetState();
     });
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

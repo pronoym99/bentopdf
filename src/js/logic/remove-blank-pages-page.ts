@@ -329,7 +329,7 @@ async function processRemoveBlankPages() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const detectBtn = document.getElementById('detect-btn');
@@ -371,4 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('back-to-tools')?.addEventListener('click', () => {
     window.location.href = '../../index.html';
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

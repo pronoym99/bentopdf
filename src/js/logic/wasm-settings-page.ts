@@ -10,7 +10,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-function initializePage() {
+export function initializePage() {
   createIcons({ icons });
 
   document.querySelectorAll('.copy-btn').forEach((btn) => {
@@ -233,3 +233,5 @@ function initializePage() {
     );
   });
 }
+
+export const init = initializePage;

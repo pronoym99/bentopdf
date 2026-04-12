@@ -40,7 +40,7 @@ let currentDoc: PyMuPDFDocument | null = null;
 const layersMap = new Map<number, LayerData>();
 let nextDisplayOrder = 0;
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -486,4 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) {
     processBtn.addEventListener('click', loadLayers);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

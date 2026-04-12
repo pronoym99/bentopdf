@@ -60,7 +60,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-function initializePage() {
+export function initializePage() {
   createIcons({ icons });
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -552,3 +552,5 @@ async function applyBatesNumbers() {
     hideLoader();
   }
 }
+
+export const init = initializePage;

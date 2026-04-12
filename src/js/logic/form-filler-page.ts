@@ -258,7 +258,7 @@ async function processAndDownloadForm() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -290,4 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
   backBtn?.addEventListener('click', () => {
     window.location.href = '../../index.html';
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

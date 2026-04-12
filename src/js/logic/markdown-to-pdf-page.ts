@@ -1,6 +1,6 @@
 import { MarkdownEditor } from '../utils/markdown-editor.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
     const container = document.getElementById('markdown-editor-container');
 
     if (!container) {
@@ -18,4 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/';
         });
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

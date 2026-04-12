@@ -130,7 +130,7 @@ async function convert() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
     const dropZone = document.getElementById('drop-zone');
     const addMoreBtn = document.getElementById('add-more-btn');
@@ -201,4 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (processBtn) {
         processBtn.addEventListener('click', convert);
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

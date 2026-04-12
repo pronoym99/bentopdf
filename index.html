@@ -101,6 +101,12 @@
   <body class="antialiased">
     {{> navbar }}
 
+    <!-- SPA tool view — hidden at home, shown when navigating to a tool -->
+    <main id="view" class="hidden"></main>
+
+    <!-- Home page content — hidden when a tool is active -->
+    <div id="home-content">
+
     <!-- Donation Ribbon -->
     <div
       id="donation-ribbon"
@@ -1417,10 +1423,11 @@
 
     {{> footer }}
 
+    </div><!-- #home-content -->
+
     <script type="module" src="src/js/utils/lucide-init.ts"></script>
     <script type="module" src="src/js/main.ts"></script>
     <script type="module" src="src/js/mobileMenu.ts"></script>
-    <script type="module" src="src/js/sw-register.ts"></script>
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">

@@ -130,7 +130,7 @@ function handleFileSelect(files: FileList | null) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -171,4 +171,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (processBtn) {
     processBtn.addEventListener('click', createZipArchive);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

@@ -189,7 +189,7 @@ async function processDeskew(): Promise<void> {
   }
 }
 
-function initPage(): void {
+export function initPage(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const addMoreBtn = document.getElementById('add-more-btn');
@@ -262,3 +262,5 @@ function initPage(): void {
 }
 
 document.addEventListener('DOMContentLoaded', initPage);
+
+export const init = initPage;

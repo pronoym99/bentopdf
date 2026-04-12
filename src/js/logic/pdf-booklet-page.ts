@@ -558,7 +558,7 @@ function handleFileSelect(files: FileList | null) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const previewBtn = document.getElementById('preview-btn');
@@ -617,4 +617,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (downloadBtn) {
     downloadBtn.addEventListener('click', createBooklet);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

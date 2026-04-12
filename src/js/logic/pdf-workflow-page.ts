@@ -56,7 +56,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-async function initializePage() {
+async export function initializePage() {
   const container = document.getElementById('rete-container');
   if (!container) return;
 
@@ -1586,3 +1586,5 @@ function formatLabel(key: string): string {
     .replace(/^./, (c) => c.toUpperCase())
     .trim();
 }
+
+export const init = initializePage;

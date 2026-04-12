@@ -39,7 +39,7 @@ function resetState(): void {
   updateProcessButton();
 }
 
-function initializePage(): void {
+export function initializePage(): void {
   createIcons({ icons });
 
   const fileInput = getElement<HTMLInputElement>('file-input');
@@ -252,3 +252,5 @@ async function processTimestamp(): Promise<void> {
 }
 
 document.addEventListener('DOMContentLoaded', initializePage);
+
+export const init = initializePage;

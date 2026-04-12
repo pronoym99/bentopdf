@@ -7,7 +7,7 @@ import {
   type LoadProgress,
 } from '../utils/libreoffice-loader.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   state.files = [];
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -223,4 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) {
     processBtn.addEventListener('click', convertToPdf);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

@@ -282,7 +282,7 @@ function populateLanguageList() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById(
@@ -466,4 +466,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

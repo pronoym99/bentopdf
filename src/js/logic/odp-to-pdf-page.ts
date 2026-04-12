@@ -10,7 +10,7 @@ import { getLibreOfficeConverter, type LoadProgress } from '../utils/libreoffice
 const ACCEPTED_EXTENSIONS = ['.odp'];
 const FILETYPE_NAME = 'ODP';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
     state.files = [];
 
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -186,4 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateUI();
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

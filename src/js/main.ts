@@ -18,6 +18,7 @@ import {
   isToolDisabled,
   isCurrentPageDisabled,
 } from './utils/disabled-tools.js';
+import { navigate, showHome, goBack, initRouter } from './router.js';
 declare const __BRAND_NAME__: string;
 
 const init = async () => {
@@ -372,6 +373,21 @@ const init = async () => {
           toolCard.href = tool.href;
           toolCard.className =
             'tool-card block bg-gray-800 rounded-xl p-4 cursor-pointer flex flex-col items-center justify-center text-center no-underline hover:shadow-lg transition duration-200';
+
+          // SPA navigation — intercept click and use router instead of full page load
+          toolCard.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Extract slug from href: e.g. "/merge-pdf.html" → "merge-pdf"
+            const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href') ?? '';
+            const slug = href.split('/').pop()?.replace('.html', '') ?? '';
+            if (slug) {
+              const homeContent = document.getElementById('home-content');
+              const viewEl = document.getElementById('view');
+              if (homeContent) homeContent.style.display = 'none';
+              if (viewEl) viewEl.classList.remove('hidden');
+              navigate(slug);
+            }
+          });
         } else {
           toolCard = document.createElement('div');
           toolCard.className =
@@ -1158,6 +1174,24 @@ const init = async () => {
 
   // Rewrite links after all dynamic content is fully loaded
   rewriteLinks();
+
+  // Initialise the client-side router so hash-based navigation works on load
+  initRouter();
+
+  // Global keyboard shortcut: Ctrl+O / Cmd+O → open file dialog via native Tauri
+  window.addEventListener('keydown', async (e) => {
+    const isMac = navigator.userAgent.toUpperCase().includes('MAC');
+    if ((isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'o') {
+      // Only if a file-input drop zone is visible in the current view
+      const fileInput = document.querySelector(
+        '#view #file-input, #view #drop-zone input[type=file]'
+      ) as HTMLInputElement | null;
+      if (fileInput) {
+        e.preventDefault();
+        fileInput.click();
+      }
+    }
+  });
 };
 
 window.addEventListener('load', init);

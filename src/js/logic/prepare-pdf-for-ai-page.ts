@@ -13,7 +13,7 @@ import type { PyMuPDFInstance } from '@/types';
 import { batchDecryptIfNeeded } from '../utils/password-prompt.js';
 import { deduplicateFileName } from '../utils/deduplicate-filename.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -246,4 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) {
     processBtn.addEventListener('click', extractForAI);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

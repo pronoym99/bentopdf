@@ -3,7 +3,7 @@ import { downloadFile, formatBytes } from '../utils/helpers.js';
 import { state } from '../state.js';
 import { createIcons, icons } from 'lucide';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   state.files = [];
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -252,4 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   updateUI();
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

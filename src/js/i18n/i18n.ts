@@ -45,28 +45,12 @@ export const languageNames: Record<SupportedLanguage, string> = {
   ko: '한국어',
 };
 
-export const getLanguageFromUrl = (): SupportedLanguage => {
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-  let path = window.location.pathname;
-
-  if (basePath && basePath !== '/' && path.startsWith(basePath)) {
-    path = path.slice(basePath.length) || '/';
-  }
-
-  if (!path.startsWith('/')) {
-    path = '/' + path;
-  }
-
-  const langMatch = path.match(
-    /^\/(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru)(?:\/|$)/
-  );
-  if (
-    langMatch &&
-    supportedLanguages.includes(langMatch[1] as SupportedLanguage)
-  ) {
-    return langMatch[1] as SupportedLanguage;
-  }
-
+/**
+ * Resolve the active language from localStorage → browser preferences → env
+ * fallback.  URL path-based locale detection is intentionally omitted so this
+ * function works identically in the SPA (Tauri) and web contexts.
+ */
+export const getLanguage = (): SupportedLanguage => {
   const storedLang = localStorage.getItem('i18nextLng');
   if (
     storedLang &&
@@ -97,12 +81,15 @@ export const getLanguageFromUrl = (): SupportedLanguage => {
   return 'en';
 };
 
+/** @deprecated Use getLanguage() — URL-based locale detection removed for SPA/Tauri. */
+export const getLanguageFromUrl = getLanguage;
+
 let initialized = false;
 
 export const initI18n = async (): Promise<typeof i18next> => {
   if (initialized) return i18next;
 
-  const currentLang = getLanguageFromUrl();
+  const currentLang = getLanguage();
 
   localStorage.setItem('i18nextLng', currentLang);
 
@@ -131,51 +118,15 @@ export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18next.t(key, options);
 };
 
-export const changeLanguage = (lang: SupportedLanguage): void => {
+/**
+ * Change the active language.  In SPA/Tauri mode this re-applies translations
+ * to the current view in-place — no page reload or URL navigation required.
+ */
+export const changeLanguage = async (lang: SupportedLanguage): Promise<void> => {
   if (!supportedLanguages.includes(lang)) return;
   localStorage.setItem('i18nextLng', lang);
-
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-  let relativePath = window.location.pathname;
-
-  if (basePath && basePath !== '/' && relativePath.startsWith(basePath)) {
-    relativePath = relativePath.slice(basePath.length) || '/';
-  }
-
-  if (!relativePath.startsWith('/')) {
-    relativePath = '/' + relativePath;
-  }
-
-  let pagePathWithoutLang = relativePath;
-  const langPrefixMatch = relativePath.match(
-    /^\/(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru)(\/.*)?$/
-  );
-  if (langPrefixMatch) {
-    pagePathWithoutLang = langPrefixMatch[2] || '/';
-  }
-
-  if (!pagePathWithoutLang.startsWith('/')) {
-    pagePathWithoutLang = '/' + pagePathWithoutLang;
-  }
-
-  let newRelativePath: string;
-  if (lang === 'en') {
-    newRelativePath = pagePathWithoutLang;
-  } else {
-    newRelativePath = `/${lang}${pagePathWithoutLang}`;
-  }
-
-  let newPath: string;
-  if (basePath && basePath !== '/') {
-    newPath = basePath + newRelativePath;
-  } else {
-    newPath = newRelativePath;
-  }
-
-  newPath = newPath.replace(/\/+/g, '/');
-
-  const newUrl = newPath + window.location.search + window.location.hash;
-  window.location.href = newUrl;
+  await i18next.changeLanguage(lang);
+  applyTranslations();
 };
 
 // Apply translations to all elements with data-i18n attribute
@@ -214,63 +165,14 @@ export const applyTranslations = (): void => {
   document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
 };
 
+/**
+ * No-op in SPA/Tauri mode — there are no href links to rewrite because
+ * navigation is handled by the client-side router.
+ *
+ * @deprecated — kept for API compatibility; safe to call but does nothing.
+ */
 export const rewriteLinks = (): void => {
-  const currentLang = getLanguageFromUrl();
-  if (currentLang === 'en') return;
-
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-  const links = document.querySelectorAll('a[href]');
-
-  links.forEach((link) => {
-    const href = link.getAttribute('href');
-    if (!href) return;
-
-    if (
-      href.startsWith('http') ||
-      href.startsWith('//') ||
-      href.startsWith('mailto:') ||
-      href.startsWith('tel:') ||
-      href.startsWith('#') ||
-      href.startsWith('javascript:')
-    ) {
-      return;
-    }
-
-    if (href.includes('/assets/')) {
-      return;
-    }
-
-    const langPrefixRegex = new RegExp(
-      `^(${basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})?/?(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru)(/|$)`
-    );
-    if (langPrefixRegex.test(href)) {
-      return;
-    }
-
-    let newHref: string;
-    if (basePath && basePath !== '/' && href.startsWith(basePath)) {
-      const pathAfterBase = href.slice(basePath.length);
-      newHref = `${basePath}/${currentLang}${pathAfterBase}`;
-    } else if (href.startsWith('/')) {
-      if (basePath && basePath !== '/') {
-        newHref = `${basePath}/${currentLang}${href}`;
-      } else {
-        newHref = `/${currentLang}${href}`;
-      }
-    } else if (href === '' || href === 'index.html') {
-      if (basePath && basePath !== '/') {
-        newHref = `${basePath}/${currentLang}/`;
-      } else {
-        newHref = `/${currentLang}/`;
-      }
-    } else {
-      newHref = `/${currentLang}/${href}`;
-    }
-
-    newHref = newHref.replace(/([^:])\/+/g, '$1/');
-
-    link.setAttribute('href', newHref);
-  });
+  // In SPA mode navigation is hash-based — no link rewriting needed.
 };
 
 export default i18next;

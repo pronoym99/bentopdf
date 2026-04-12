@@ -699,7 +699,7 @@ function cancelDestinationPicking(): void {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   initializeGlobalShortcuts();
 
   const canvasEl = document.getElementById(
@@ -816,7 +816,9 @@ document.addEventListener('DOMContentLoaded', () => {
       cancelDestinationPicking();
     });
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);
 
 function showConfirmModal(message: string): Promise<boolean> {
   return new Promise((resolve) => {

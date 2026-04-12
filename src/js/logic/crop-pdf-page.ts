@@ -28,7 +28,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-function initializePage() {
+export function initializePage() {
   createIcons({ icons });
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -443,3 +443,5 @@ function resetState() {
   const cropBtn = document.getElementById('crop-button') as HTMLButtonElement;
   if (cropBtn) cropBtn.disabled = true;
 }
+
+export const init = initializePage;

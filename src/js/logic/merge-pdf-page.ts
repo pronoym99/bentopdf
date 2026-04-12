@@ -597,7 +597,7 @@ export async function refreshMergeUI() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -674,4 +674,6 @@ document.addEventListener('DOMContentLoaded', () => {
       await merge();
     });
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

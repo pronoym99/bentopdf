@@ -161,7 +161,7 @@ function updateTextareaDirection(textarea: HTMLTextAreaElement) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const addMoreBtn = document.getElementById('add-more-btn');
@@ -278,4 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   createIcons({ icons });
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

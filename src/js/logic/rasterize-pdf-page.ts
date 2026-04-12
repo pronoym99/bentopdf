@@ -14,7 +14,7 @@ import { batchDecryptIfNeeded } from '../utils/password-prompt.js';
 import { deduplicateFileName } from '../utils/deduplicate-filename.js';
 import { showWasmRequiredDialog } from '../utils/wasm-provider.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -273,4 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) {
     processBtn.addEventListener('click', rasterize);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);
