@@ -41,9 +41,7 @@
   "plugins": {
     "dialog": null,
     "fs": {
-      "scope": {
-        "allow": ["$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$DESKTOP/**"]
-      }
+      "requireLiteralLeadingDot": false
     },
     "shell": {
       "open": true
