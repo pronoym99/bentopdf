@@ -39,7 +39,7 @@
     ]
   },
   "plugins": {
-    "dialog": true,
+    "dialog": null,
     "fs": {
       "scope": {
         "allow": ["$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$DESKTOP/**"]
