@@ -154,8 +154,8 @@ export async function initializePage(): Promise<void> {
     showLoadTemplateModal(editor, area);
   });
 
-  document.getElementById('export-btn')?.addEventListener('click', () => {
-    exportWorkflow(editor, area);
+  document.getElementById('export-btn')?.addEventListener('click', async () => {
+    await exportWorkflow(editor, area);
   });
 
   document.getElementById('import-btn')?.addEventListener('click', async () => {
