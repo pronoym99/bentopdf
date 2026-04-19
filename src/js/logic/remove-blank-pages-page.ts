@@ -369,7 +369,7 @@ export function init(): void {
   processBtn?.addEventListener('click', processRemoveBlankPages);
 
   document.getElementById('back-to-tools')?.addEventListener('click', () => {
-    window.router?.goBack();
+    window.location.href = import.meta.env.BASE_URL;
   });
 }
 

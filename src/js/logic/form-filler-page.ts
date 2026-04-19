@@ -288,7 +288,7 @@ export function init(): void {
   processBtn?.addEventListener('click', processAndDownloadForm);
 
   backBtn?.addEventListener('click', () => {
-    window.router?.goBack();
+    window.location.href = import.meta.env.BASE_URL;
   });
 }
 

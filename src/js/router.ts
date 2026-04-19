@@ -214,7 +214,7 @@ export async function navigate(slug: string): Promise<void> {
         (e) => {
           e.preventDefault();
           e.stopImmediatePropagation();
-          goBack();
+          showHome();
         },
         true // capture phase — runs before bubble-phase handlers
       );
