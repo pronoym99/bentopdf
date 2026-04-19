@@ -71,6 +71,16 @@ export const formatBytes = (bytes: number, decimals = 1) => {
 };
 
 export const downloadFile = (blob: Blob, filename: string): void => {
+  if (typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window) {
+    import('../tauri/fileIO.js').then(({ saveFile }) => {
+      const ext = filename.includes('.') ? filename.split('.').pop()! : '';
+      saveFile(blob, {
+        defaultName: filename,
+        filters: ext ? [{ name: ext.toUpperCase(), extensions: [ext] }] : undefined,
+      }).catch((err) => console.error('[downloadFile] Tauri save error:', err));
+    });
+    return;
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
