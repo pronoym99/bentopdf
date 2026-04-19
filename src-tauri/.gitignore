@@ -1,0 +1,8 @@
+# Rust build output
+target/
+
+# Cargo.lock is generated at build time for the Tauri binary;
+# keep it out of version control (the workspace root Cargo.lock,
+# if any, should be managed separately).
+# Uncomment the next line only if you do NOT want to pin dependency versions:
+# Cargo.lock
