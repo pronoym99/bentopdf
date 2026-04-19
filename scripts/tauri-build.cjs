@@ -13,7 +13,7 @@ const { execSync } = require('child_process');
 
 // Step 1: populate public/wasm/ from node_modules
 console.log('[tauri-build] Preparing local WASM assets…');
-require('./prepare-wasm.js');
+require('./prepare-wasm.cjs');
 
 // Step 2: Point WASM loaders at the local copies that ship inside the app bundle.
 // These defaults are only applied when the variable is not already set.
