@@ -38,9 +38,21 @@ function copyDir(srcDir, destDir) {
   }
 }
 
+/** Abort with a friendly message when a required package is missing. */
+function requirePackage(pkgPath, pkgName) {
+  if (!fs.existsSync(pkgPath)) {
+    console.error(
+      `[prepare-wasm] ERROR: Cannot find "${pkgName}" in node_modules.\n` +
+      `  Run  npm install  (or  bun install / pnpm install)  and retry.`
+    );
+    process.exit(1);
+  }
+}
+
 function run() {
   // ── PyMuPDF ──────────────────────────────────────────────────────────────
   const pymupdfBase = path.join(ROOT, 'node_modules', '@bentopdf', 'pymupdf-wasm');
+  requirePackage(pymupdfBase, '@bentopdf/pymupdf-wasm');
   console.log('[prepare-wasm] PyMuPDF…');
   copyFile(
     path.join(pymupdfBase, 'dist', 'index.js'),
@@ -52,12 +64,14 @@ function run() {
   );
 
   // ── Ghostscript ──────────────────────────────────────────────────────────
+  requirePackage(path.join(ROOT, 'node_modules', '@bentopdf', 'gs-wasm'), '@bentopdf/gs-wasm');
   const gsBase = path.join(ROOT, 'node_modules', '@bentopdf', 'gs-wasm', 'assets');
   console.log('[prepare-wasm] Ghostscript…');
   copyFile(path.join(gsBase, 'gs.js'),   path.join(PUBLIC_WASM, 'ghostscript', 'gs.js'));
   copyFile(path.join(gsBase, 'gs.wasm'), path.join(PUBLIC_WASM, 'ghostscript', 'gs.wasm'));
 
   // ── CoherentPDF ──────────────────────────────────────────────────────────
+  requirePackage(path.join(ROOT, 'node_modules', 'coherentpdf'), 'coherentpdf');
   const cpdfBase = path.join(ROOT, 'node_modules', 'coherentpdf', 'dist');
   console.log('[prepare-wasm] CoherentPDF…');
   copyFile(
