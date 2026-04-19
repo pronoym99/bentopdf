@@ -282,9 +282,7 @@ export const html = `
 
 export async function init(): Promise<void> {
   const mod = await import('../js/logic/pdf-workflow-page.js');
-  if (typeof mod.init === 'function') {
-    mod.init();
-  }
+  await mod.initializePage();
 }
 
 export default { html, init } satisfies PageModule;

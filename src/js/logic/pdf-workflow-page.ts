@@ -50,13 +50,24 @@ let workflowEditor: WorkflowEditor | null = null;
 let selectedNodeId: string | null = null;
 let deleteNodeHandler: EventListener | null = null;
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializePage);
-} else {
-  initializePage();
+// Auto-init only when loaded as a standalone page (not inside the SPA router,
+// which has a #view container and calls initializePage() explicitly).
+if (!document.getElementById('view')) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePage);
+  } else {
+    initializePage();
+  }
 }
 
 export async function initializePage(): Promise<void> {
+  // Destroy any previous editor instance (supports re-navigation in the SPA)
+  if (workflowEditor) {
+    workflowEditor.destroy();
+    workflowEditor = null;
+  }
+  selectedNodeId = null;
+
   const container = document.getElementById('rete-container');
   if (!container) return;
 
