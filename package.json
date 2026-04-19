@@ -141,7 +141,10 @@
     "vite-plugin-static-copy": "^3.2.0",
     "wasm-vips": "^0.0.17",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
-    "zgapdfsigner": "^2.7.5"
+    "zgapdfsigner": "^2.7.5",
+    "@bentopdf/pymupdf-wasm": "0.11.16",
+    "@bentopdf/gs-wasm": "0.1.1",
+    "coherentpdf": "2.5.5"
   },
   "lint-staged": {
     "*.{js,ts,mjs,cjs}": [

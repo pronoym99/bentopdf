@@ -40,6 +40,9 @@ bun.lock
 .seo-backup
 libreoffice-wasm-package
 
+# WASM binaries — downloaded from npm at build time by scripts/prepare-wasm.js
+public/wasm/
+
 # helm chart
 bentopdf-*.tgz
 
