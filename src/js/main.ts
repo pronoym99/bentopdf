@@ -441,6 +441,22 @@ const init = async () => {
       'hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 col-span-full';
     dom.toolGrid.insertBefore(searchResultsContainer, dom.toolGrid.firstChild);
 
+    // Delegate SPA navigation for cloned search-result cards (cloneNode strips listeners)
+    searchResultsContainer.addEventListener('click', (e) => {
+      const card = (e.target as Element).closest('.tool-card');
+      if (!card || card.tagName !== 'A') return;
+      e.preventDefault();
+      const href = (card as HTMLAnchorElement).getAttribute('href') ?? '';
+      const slug = href.split('/').pop()?.replace('.html', '') ?? '';
+      if (slug) {
+        const homeContent = document.getElementById('home-content');
+        const viewEl = document.getElementById('view');
+        if (homeContent) homeContent.style.display = 'none';
+        if (viewEl) viewEl.classList.remove('hidden');
+        navigate(slug);
+      }
+    });
+
     searchBar.addEventListener('input', () => {
       // @ts-expect-error TS(2339) FIXME: Property 'value' does not exist on type 'HTMLEleme... Remove this comment to see the full error message
       const searchTerm = searchBar.value.toLowerCase().trim();
