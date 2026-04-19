@@ -56,7 +56,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-async export function initializePage() {
+export async function initializePage(): Promise<void> {
   const container = document.getElementById('rete-container');
   if (!container) return;
 

@@ -300,9 +300,12 @@ export const html = `
 
 export async function init(): Promise<void> {
   const mod = await import('../js/logic/font-to-outline-page.js');
-  if (typeof mod.init === 'function') {
+  if ('init' in mod && typeof mod.init === 'function') {
     mod.init();
-  } else if (typeof mod.initializePage === 'function') {
+  } else if (
+    'initializePage' in mod &&
+    typeof mod.initializePage === 'function'
+  ) {
     mod.initializePage();
   }
 }

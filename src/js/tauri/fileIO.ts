@@ -103,8 +103,8 @@ export async function onNativeDrop(
   if (!isTauri()) return () => {};
 
   try {
-    const { getCurrent } = await import('@tauri-apps/api/window');
-    const win = getCurrent();
+    const { getCurrentWindow } = await import('@tauri-apps/api/window');
+    const win = getCurrentWindow();
     const unlisten = await win.onDragDropEvent(async (event) => {
       if (event.payload.type !== 'drop') return;
       const paths: string[] = event.payload.paths ?? [];
@@ -232,7 +232,7 @@ function _browserOpenFiles(opts: OpenFileOptions): Promise<NativeFile[]> {
 function _browserSaveFile(data: Blob | Uint8Array, opts: SaveFileOptions): void {
   const blob =
     data instanceof Uint8Array
-      ? new Blob([data], { type: 'application/octet-stream' })
+      ? new Blob([new Uint8Array(data).buffer], { type: 'application/octet-stream' })
       : data;
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
