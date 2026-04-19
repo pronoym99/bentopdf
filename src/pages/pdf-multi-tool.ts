@@ -1,6 +1,13 @@
 // Auto-generated SPA page module for pdf-multi-tool
 import type { PageModule } from '../js/types/router.js';
 
+declare const __BRAND_NAME__: string;
+declare const __BRAND_LOGO__: string;
+
+const _brandName = __BRAND_NAME__ || 'BentoPDF';
+const _brandNameLong = __BRAND_NAME__ || 'Bento PDF';
+const _logoSrc = `${import.meta.env.BASE_URL}${__BRAND_LOGO__ || 'images/favicon-no-bg.svg'}`;
+
 export const html = `
 
     <!-- Navigation -->
@@ -9,13 +16,13 @@ export const html = `
         <div class="flex justify-between items-center h-16">
           <div class="flex-shrink-0 flex items-center">
             <img
-              src="{{baseUrl}}{{#if brandLogo}}{{brandLogo}}{{else}}images/favicon-no-bg.svg{{/if}}"
-              alt="{{#if brandName}}{{brandName}}{{else}}Bento PDF{{/if}} Logo"
+              src="${_logoSrc}"
+              alt="${_brandNameLong} Logo"
               class="h-8 w-8"
             />
             <span class="text-white font-bold text-xl ml-2">
               <a href="/"
-                >{{#if brandName}}{{brandName}}{{else}}BentoPDF{{/if}}</a
+                >${_brandName}</a
               >
             </span>
             <span class="text-gray-400 ml-3 text-sm sm:text-base"
