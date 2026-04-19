@@ -2,6 +2,74 @@
 import type { PageModule } from '../js/types/router.js';
 
 export const html = `
+  <style>
+    /*
+     * SPA layout fix: #view has no height or flex in the SPA context, so the
+     * flex-1 chain inside #workflow-app collapses to 0 height. Give #view the
+     * same full-height flex-column layout that the standalone page's <body> provides.
+     * 4rem = 64px = navbar h-16 height.
+     */
+    #view {
+      height: calc(100vh - 4rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Rete canvas: dotted grid background + pointer behaviour */
+    #rete-container {
+      background-image: radial-gradient(circle, #374151 1px, transparent 1px);
+      background-size: 20px 20px;
+      cursor: default;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    #toolbox-sidebar {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    #rete-container.is-panning {
+      cursor: grabbing;
+    }
+
+    #rete-container [data-testid='node'] {
+      cursor: pointer;
+    }
+
+    #rete-container [data-testid='node']:active {
+      cursor: grabbing;
+    }
+
+    /* Connection path colour */
+    .connection .main-path {
+      stroke: #6366f1;
+      stroke-width: 2px;
+      fill: none;
+    }
+
+    /* Node status bar and dot animations (used by updateNodeDisplay in editor.ts) */
+    @keyframes wf-bar-slide {
+      0%   { background-position:  200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    @keyframes wf-dot-pulse {
+      0%, 100% { opacity: 1;   transform: scale(1);    }
+      50%       { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    .wf-bar-slide {
+      animation: wf-bar-slide 1.5s ease-in-out infinite;
+    }
+
+    .wf-dot-pulse {
+      animation: wf-dot-pulse 1.2s ease-in-out infinite;
+    }
+  </style>
 
     <!-- Main Workflow Layout -->
     <div id="workflow-app" class="flex flex-1 min-h-0">
