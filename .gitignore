@@ -33,6 +33,9 @@ coverage/
 # Generated sitemap
 public/sitemap.xml
 
+# Bun lockfile (auto-generated)
+bun.lock
+
 #backup
 .seo-backup
 libreoffice-wasm-package
