@@ -568,6 +568,14 @@ function buildToolbox() {
 
         if (!wasDrag || !workflowEditor) return;
 
+        // The browser fires a synthetic `click` after pointerup on the same
+        // element. Suppress it once so the click handler doesn't add a second
+        // node after we already placed one via the drag.
+        item.addEventListener('click', (ce) => ce.stopImmediatePropagation(), {
+          once: true,
+          capture: true,
+        });
+
         const rc = document.getElementById('rete-container');
         if (rc) {
           const rect = rc.getBoundingClientRect();
