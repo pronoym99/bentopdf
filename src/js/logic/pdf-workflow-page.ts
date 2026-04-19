@@ -49,6 +49,7 @@ import {
 let workflowEditor: WorkflowEditor | null = null;
 let selectedNodeId: string | null = null;
 let deleteNodeHandler: EventListener | null = null;
+let keydownHandler: EventListener | null = null;
 
 // Auto-init only when loaded as a standalone page (not inside the SPA router,
 // which has a #view container and calls initializePage() explicitly).
@@ -67,6 +68,12 @@ export async function initializePage(): Promise<void> {
     workflowEditor = null;
   }
   selectedNodeId = null;
+
+  // Remove stale document-level listeners from any previous visit
+  if (keydownHandler) {
+    document.removeEventListener('keydown', keydownHandler);
+    keydownHandler = null;
+  }
 
   const container = document.getElementById('rete-container');
   if (!container) return;
@@ -252,7 +259,7 @@ export async function initializePage(): Promise<void> {
     document.getElementById('settings-sidebar')?.classList.add('hidden');
   });
 
-  document.addEventListener('keydown', (e) => {
+  keydownHandler = ((e: KeyboardEvent) => {
     if (!selectedNodeId || !workflowEditor) return;
     if (e.key === 'Delete' || e.key === 'Backspace') {
       const tag = (e.target as HTMLElement).tagName;
@@ -260,7 +267,8 @@ export async function initializePage(): Promise<void> {
       e.preventDefault();
       deleteSelectedNode();
     }
-  });
+  }) as EventListener;
+  document.addEventListener('keydown', keydownHandler);
 
   if (deleteNodeHandler) {
     document.removeEventListener('wf-delete-node', deleteNodeHandler);
