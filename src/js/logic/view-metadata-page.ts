@@ -323,8 +323,8 @@ async function updateUI() {
 
 function copyMetadataAsJson() {
   const jsonString = JSON.stringify(pageState.metadata, null, 2);
-  navigator.clipboard
-    .writeText(jsonString)
+  import('../tauri/clipboard.js')
+    .then(({ writeTextToClipboard }) => writeTextToClipboard(jsonString))
     .then(function () {
       showAlert('Copied', 'Metadata copied to clipboard as JSON.');
     })

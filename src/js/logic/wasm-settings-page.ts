@@ -17,7 +17,9 @@ export function initializePage() {
     btn.addEventListener('click', async () => {
       const url = btn.getAttribute('data-copy');
       if (url) {
-        await navigator.clipboard.writeText(url);
+        await import('../tauri/clipboard.js').then(({ writeTextToClipboard }) =>
+          writeTextToClipboard(url)
+        );
         const svg = btn.querySelector('svg');
         if (svg) {
           const checkIcon = document.createElement('i');

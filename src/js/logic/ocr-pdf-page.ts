@@ -425,7 +425,9 @@ export function init(): void {
         'ocr-text-output'
       ) as HTMLTextAreaElement;
       if (textOutput) {
-        navigator.clipboard.writeText(textOutput.value).then(function () {
+        import('../tauri/clipboard.js').then(({ writeTextToClipboard }) =>
+          writeTextToClipboard(textOutput.value)
+        ).then(function () {
           copyBtn.innerHTML =
             '<i data-lucide="check" class="w-4 h-4 text-green-400"></i>';
           createIcons({ icons });
