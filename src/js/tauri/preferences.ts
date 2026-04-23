@@ -31,7 +31,7 @@ const _cache: Record<string, string> = {};
 async function getStore(): Promise<StoreInstance> {
   if (!_store) {
     const { Store } = await import('@tauri-apps/plugin-store');
-    _store = await Store.load(STORE_FILE, { autoSave: true });
+    _store = await Store.load(STORE_FILE, { autoSave: true, defaults: {} });
   }
   return _store;
 }
