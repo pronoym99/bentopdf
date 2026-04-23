@@ -15,7 +15,8 @@
         { "path": "$HOME/**" },
         { "path": "$DOCUMENT/**" },
         { "path": "$DOWNLOAD/**" },
-        { "path": "$DESKTOP/**" }
+        { "path": "$DESKTOP/**" },
+        { "path": "$APPCACHE/**" }
       ]
     },
     {
@@ -24,7 +25,8 @@
         { "path": "$HOME/**" },
         { "path": "$DOCUMENT/**" },
         { "path": "$DOWNLOAD/**" },
-        { "path": "$DESKTOP/**" }
+        { "path": "$DESKTOP/**" },
+        { "path": "$APPCACHE/**" }
       ]
     },
     {
@@ -33,7 +35,8 @@
         { "path": "$HOME/**" },
         { "path": "$DOCUMENT/**" },
         { "path": "$DOWNLOAD/**" },
-        { "path": "$DESKTOP/**" }
+        { "path": "$DESKTOP/**" },
+        { "path": "$APPCACHE/**" }
       ]
     },
     {
@@ -42,7 +45,20 @@
         { "path": "$HOME/**" },
         { "path": "$DOCUMENT/**" },
         { "path": "$DOWNLOAD/**" },
-        { "path": "$DESKTOP/**" }
+        { "path": "$DESKTOP/**" },
+        { "path": "$APPCACHE/**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [
+        { "path": "$APPCACHE/**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [
+        { "path": "$APPCACHE/**" }
       ]
     }
   ]

@@ -10,6 +10,12 @@ const DB_NAME = 'bentopdf-fonts';
 const DB_VERSION = 1;
 const STORE_NAME = 'fonts';
 
+const TAURI_FONT_CACHE_DIR = 'fonts';
+
+function isTauri(): boolean {
+  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+}
+
 type OcrFontEnv = Partial<Pick<ImportMetaEnv, 'VITE_OCR_FONT_BASE_URL'>>;
 
 function getDefaultFontEnv(): OcrFontEnv {
@@ -38,6 +44,55 @@ export function resolveFontUrl(
 
   return getFontUrlForFamily(fontFamily);
 }
+
+// ---------------------------------------------------------------------------
+// Tauri native FS cache (AppCache/fonts/<assetFileName>)
+// ---------------------------------------------------------------------------
+
+async function getTauriCachedFont(
+  fontFamily: string
+): Promise<ArrayBuffer | null> {
+  try {
+    const { readFile, exists, BaseDirectory } = await import(
+      '@tauri-apps/plugin-fs'
+    );
+    const fileName = getFontAssetFileName(fontFamily);
+    const path = `${TAURI_FONT_CACHE_DIR}/${fileName}`;
+    const cached = await exists(path, { baseDir: BaseDirectory.AppCache });
+    if (!cached) return null;
+    const bytes = await readFile(path, { baseDir: BaseDirectory.AppCache });
+    return bytes.buffer as ArrayBuffer;
+  } catch (error) {
+    console.warn('Native FS font read failed:', error);
+    return null;
+  }
+}
+
+async function saveTauriFont(
+  fontFamily: string,
+  fontBuffer: ArrayBuffer
+): Promise<void> {
+  try {
+    const { writeFile, mkdir, BaseDirectory } = await import(
+      '@tauri-apps/plugin-fs'
+    );
+    await mkdir(TAURI_FONT_CACHE_DIR, {
+      baseDir: BaseDirectory.AppCache,
+      recursive: true,
+    });
+    const fileName = getFontAssetFileName(fontFamily);
+    const path = `${TAURI_FONT_CACHE_DIR}/${fileName}`;
+    await writeFile(path, new Uint8Array(fontBuffer), {
+      baseDir: BaseDirectory.AppCache,
+    });
+  } catch (error) {
+    console.warn('Native FS font write failed:', error);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// IndexedDB cache (browser)
+// ---------------------------------------------------------------------------
 
 async function openFontDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -99,7 +154,11 @@ export async function getFontForLanguage(lang: string): Promise<ArrayBuffer> {
   if (fontCache.has(fontFamily)) {
     return fontCache.get(fontFamily)!;
   }
-  const cachedFont = await getCachedFontFromDB(fontFamily);
+
+  const cachedFont = isTauri()
+    ? await getTauriCachedFont(fontFamily)
+    : await getCachedFontFromDB(fontFamily);
+
   if (cachedFont) {
     fontCache.set(fontFamily, cachedFont);
     return cachedFont;
@@ -117,7 +176,12 @@ export async function getFontForLanguage(lang: string): Promise<ArrayBuffer> {
     const fontBuffer = await fontResponse.arrayBuffer();
 
     fontCache.set(fontFamily, fontBuffer);
-    await saveFontToDB(fontFamily, fontBuffer);
+
+    if (isTauri()) {
+      await saveTauriFont(fontFamily, fontBuffer);
+    } else {
+      await saveFontToDB(fontFamily, fontBuffer);
+    }
 
     return fontBuffer;
   } catch (error) {
