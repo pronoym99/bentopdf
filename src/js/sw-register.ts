@@ -6,12 +6,20 @@
  * conflicts with Vite's HMR (Hot Module Replacement)
  */
 
+// Service workers require a secure HTTP origin and are not supported in the
+// Tauri desktop app, where pages are served via a custom protocol (tauri://).
+// Attempting registration in that context produces a console error, so we
+// skip silently here.
+const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
 // Skip service worker registration in development mode
 const isDevelopment = window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1' ||
     window.location.port !== '';
 
-if (isDevelopment) {
+if (isTauri) {
+    // Service workers are not used in the desktop build – no-op.
+} else if (isDevelopment) {
     console.log('[Dev Mode] Service Worker registration skipped in development');
     console.log('Service Worker will be active in production builds');
 } else if ('serviceWorker' in navigator) {
