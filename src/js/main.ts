@@ -19,9 +19,11 @@ import {
   isCurrentPageDisabled,
 } from './utils/disabled-tools.js';
 import { navigate, showHome, goBack, initRouter } from './router.js';
+import { initPreferences, getPreference, setPreference } from './tauri/preferences.js';
 declare const __BRAND_NAME__: string;
 
 const init = async () => {
+  await initPreferences();
   await initI18n();
   await loadRuntimeConfig();
   injectLanguageSwitcher();
@@ -639,7 +641,7 @@ const init = async () => {
   ) as HTMLInputElement;
   const toolInterface = document.getElementById('tool-interface');
 
-  const savedFullWidth = localStorage.getItem('fullWidthMode') !== 'false';
+  const savedFullWidth = getPreference('fullWidthMode') !== 'false';
   if (fullWidthToggle) {
     fullWidthToggle.checked = savedFullWidth;
     applyFullWidthMode(savedFullWidth);
@@ -674,7 +676,7 @@ const init = async () => {
   if (fullWidthToggle) {
     fullWidthToggle.addEventListener('change', (e) => {
       const enabled = (e.target as HTMLInputElement).checked;
-      localStorage.setItem('fullWidthMode', enabled.toString());
+      setPreference('fullWidthMode', enabled.toString());
       applyFullWidthMode(enabled);
     });
   }

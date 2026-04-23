@@ -1,8 +1,10 @@
 // Full-width mode utility
-// This script applies the full-width preference from localStorage to page uploaders
+// This script applies the full-width preference to page uploaders
+
+import { getPreference } from '../tauri/preferences';
 
 export function initFullWidthMode() {
-    const savedFullWidth = localStorage.getItem('fullWidthMode') !== 'false';
+    const savedFullWidth = getPreference('fullWidthMode') !== 'false';
 
     if (savedFullWidth) {
         applyFullWidthMode(true);
