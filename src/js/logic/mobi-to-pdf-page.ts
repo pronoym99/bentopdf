@@ -8,7 +8,7 @@ const FILETYPE = 'mobi';
 const EXTENSIONS = ['.mobi'];
 const TOOL_NAME = 'MOBI';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -208,4 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) {
     processBtn.addEventListener('click', convertToPdf);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

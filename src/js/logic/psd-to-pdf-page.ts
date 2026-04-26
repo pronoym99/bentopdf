@@ -17,7 +17,7 @@ async function ensurePyMuPDF(): Promise<PyMuPDFInstance> {
   return pymupdf;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -162,4 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (addMoreBtn) addMoreBtn.addEventListener('click', () => fileInput.click());
   if (clearFilesBtn) clearFilesBtn.addEventListener('click', resetState);
   if (processBtn) processBtn.addEventListener('click', convert);
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

@@ -301,7 +301,7 @@ function handleAttachmentSelect(files: FileList | null) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const attachmentInput = document.getElementById(
@@ -403,4 +403,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (processBtn) {
     processBtn.addEventListener('click', addAttachments);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

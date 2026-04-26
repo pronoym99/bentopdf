@@ -329,7 +329,7 @@ async function processRemoveBlankPages() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const detectBtn = document.getElementById('detect-btn');
@@ -369,6 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
   processBtn?.addEventListener('click', processRemoveBlankPages);
 
   document.getElementById('back-to-tools')?.addEventListener('click', () => {
-    window.location.href = '../../index.html';
+    window.location.href = import.meta.env.BASE_URL;
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

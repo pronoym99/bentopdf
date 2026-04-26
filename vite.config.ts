@@ -352,6 +352,7 @@ function rewriteHtmlPathsPlugin(): Plugin {
 
 export default defineConfig(() => {
   const USE_CDN = process.env.VITE_USE_CDN === 'true';
+  const isTauriBuild = process.env.TAURI_ENV_TARGET_TRIPLE !== undefined;
 
   if (USE_CDN) {
     console.log('[Vite] Using CDN for WASM files (with local fallback)');
@@ -367,13 +368,13 @@ export default defineConfig(() => {
   ];
 
   return {
-    base: (process.env.BASE_URL || '/').replace(/\/?$/, '/'),
+    // Use relative paths for Tauri's tauri:// protocol; absolute for web hosting
+    base: isTauriBuild ? './' : (process.env.BASE_URL || '/').replace(/\/?$/, '/'),
     plugins: [
-      // basicSsl(),
       handlebars({
         partialDirectory: resolve(__dirname, 'src/partials'),
         context: {
-          baseUrl: (process.env.BASE_URL || '/').replace(/\/?$/, '/'),
+          baseUrl: isTauriBuild ? './' : (process.env.BASE_URL || '/').replace(/\/?$/, '/'),
           simpleMode: process.env.SIMPLE_MODE === 'true',
           brandName: process.env.VITE_BRAND_NAME || '',
           brandLogo: process.env.VITE_BRAND_LOGO || '',
@@ -381,7 +382,8 @@ export default defineConfig(() => {
           appVersion: process.env.npm_package_version || 'Unknown',
         },
       }),
-      languageRouterPlugin(),
+      // Language router middleware is only needed for the web multi-page build
+      ...(isTauriBuild ? [] : [languageRouterPlugin()]),
       flattenPagesPlugin(),
       rewriteHtmlPathsPlugin(),
       tailwindcss(),
@@ -396,31 +398,38 @@ export default defineConfig(() => {
       viteStaticCopy({
         targets: staticCopyTargets,
       }),
-      viteCompression({
-        algorithm: 'brotliCompress',
-        ext: '.br',
-        threshold: 1024,
-        compressionOptions: {
-          params: {
-            [zlibConstants.BROTLI_PARAM_QUALITY]: 11,
-            [zlibConstants.BROTLI_PARAM_MODE]: zlibConstants.BROTLI_MODE_TEXT,
-          },
-        },
-        deleteOriginFile: false,
-      }),
-      viteCompression({
-        algorithm: 'gzip',
-        ext: '.gz',
-        threshold: 1024,
-        compressionOptions: {
-          level: 9,
-        },
-        deleteOriginFile: false,
-      }),
+      // Compression plugins are only useful for web server deployments
+      ...(isTauriBuild
+        ? []
+        : [
+            viteCompression({
+              algorithm: 'brotliCompress',
+              ext: '.br',
+              threshold: 1024,
+              compressionOptions: {
+                params: {
+                  [zlibConstants.BROTLI_PARAM_QUALITY]: 11,
+                  [zlibConstants.BROTLI_PARAM_MODE]:
+                    zlibConstants.BROTLI_MODE_TEXT,
+                },
+              },
+              deleteOriginFile: false,
+            }),
+            viteCompression({
+              algorithm: 'gzip',
+              ext: '.gz',
+              threshold: 1024,
+              compressionOptions: {
+                level: 9,
+              },
+              deleteOriginFile: false,
+            }),
+          ]),
     ],
     define: {
       __SIMPLE_MODE__: JSON.stringify(process.env.SIMPLE_MODE === 'true'),
       __BRAND_NAME__: JSON.stringify(process.env.VITE_BRAND_NAME || ''),
+      __BRAND_LOGO__: JSON.stringify(process.env.VITE_BRAND_LOGO || ''),
       __DISABLED_TOOLS__: JSON.stringify(
         (process.env.DISABLE_TOOLS || '')
           .split(',')
@@ -454,12 +463,18 @@ export default defineConfig(() => {
     },
     build: {
       rollupOptions: {
-        input: {
-          main:
-            process.env.SIMPLE_MODE === 'true'
-              ? resolve(__dirname, 'simple-index.html')
-              : resolve(__dirname, 'index.html'),
-          about: resolve(__dirname, 'about.html'),
+        input: isTauriBuild
+          ? // SPA mode for Tauri — single entry point, lazy-loaded tool modules
+            {
+              main: resolve(__dirname, 'index.html'),
+            }
+          : // Multi-page mode for web deployment (unchanged)
+            {
+              main:
+                process.env.SIMPLE_MODE === 'true'
+                  ? resolve(__dirname, 'simple-index.html')
+                  : resolve(__dirname, 'index.html'),
+              about: resolve(__dirname, 'about.html'),
           contact: resolve(__dirname, 'contact.html'),
           faq: resolve(__dirname, 'faq.html'),
           privacy: resolve(__dirname, 'privacy.html'),

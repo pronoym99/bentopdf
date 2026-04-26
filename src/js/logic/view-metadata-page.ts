@@ -323,8 +323,8 @@ async function updateUI() {
 
 function copyMetadataAsJson() {
   const jsonString = JSON.stringify(pageState.metadata, null, 2);
-  navigator.clipboard
-    .writeText(jsonString)
+  import('../tauri/clipboard.js')
+    .then(({ writeTextToClipboard }) => writeTextToClipboard(jsonString))
     .then(function () {
       showAlert('Copied', 'Metadata copied to clipboard as JSON.');
     })
@@ -347,7 +347,7 @@ function handleFileSelect(files: FileList | null) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const copyBtn = document.getElementById('copy-metadata');
@@ -401,4 +401,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (copyBtn) {
     copyBtn.addEventListener('click', copyMetadataAsJson);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

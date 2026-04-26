@@ -155,11 +155,13 @@ function hideLoading() {
   if (loader) loader.classList.add('hidden');
 }
 
+export function init(): void {
+  console.log('PDF Multi Tool: DOMContentLoaded');
+  initializeTool();
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('PDF Multi Tool: DOMContentLoaded');
-    initializeTool();
-  });
+  document.addEventListener('DOMContentLoaded', init);
 } else {
   console.log(
     'PDF Multi Tool: DOMContentLoaded already fired, initializing immediately'

@@ -247,7 +247,7 @@ function setupDropZone(
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const baseDropZone = document.getElementById('base-drop-zone');
   const baseInput = document.getElementById(
     'base-file-input'
@@ -282,4 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) {
     processBtn.addEventListener('click', processOverlay);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

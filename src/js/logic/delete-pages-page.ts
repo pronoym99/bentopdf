@@ -30,7 +30,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-function initializePage() {
+export function initializePage() {
   createIcons({ icons });
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -305,3 +305,5 @@ function resetState() {
   const container = document.getElementById('delete-pages-preview');
   if (container) container.innerHTML = '';
 }
+
+export const init = initializePage;

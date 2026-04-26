@@ -2,6 +2,7 @@
 import { createIcons, icons } from 'lucide';
 import { getPDFDocument } from '../utils/helpers.js';
 import { loadPdfWithPasswordPrompt } from '../utils/password-prompt.js';
+import { getPreference } from '../tauri/preferences.js';
 
 let viewerIframe: HTMLIFrameElement | null = null;
 let viewerReady = false;
@@ -94,7 +95,7 @@ function resetState() {
   }
 
   const toolUploader = document.getElementById('tool-uploader');
-  const isFullWidth = localStorage.getItem('fullWidthMode') !== 'false';
+  const isFullWidth = getPreference('fullWidthMode') !== 'false';
   if (toolUploader && !isFullWidth) {
     toolUploader.classList.remove('max-w-6xl');
     toolUploader.classList.add('max-w-2xl');
@@ -158,7 +159,7 @@ async function setupFormViewer() {
 
   const toolUploader = document.getElementById('tool-uploader');
   // Default to true if not set
-  const isFullWidth = localStorage.getItem('fullWidthMode') !== 'false';
+  const isFullWidth = getPreference('fullWidthMode') !== 'false';
   if (toolUploader && !isFullWidth) {
     toolUploader.classList.remove('max-w-2xl');
     toolUploader.classList.add('max-w-6xl');
@@ -258,7 +259,7 @@ async function processAndDownloadForm() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById('process-btn');
@@ -288,6 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
   processBtn?.addEventListener('click', processAndDownloadForm);
 
   backBtn?.addEventListener('click', () => {
-    window.location.href = '../../index.html';
+    window.location.href = import.meta.env.BASE_URL;
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

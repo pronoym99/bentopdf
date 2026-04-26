@@ -18,9 +18,12 @@ import {
   isToolDisabled,
   isCurrentPageDisabled,
 } from './utils/disabled-tools.js';
+import { navigate, showHome, goBack, initRouter } from './router.js';
+import { initPreferences, getPreference, setPreference } from './tauri/preferences.js';
 declare const __BRAND_NAME__: string;
 
 const init = async () => {
+  await initPreferences();
   await initI18n();
   await loadRuntimeConfig();
   injectLanguageSwitcher();
@@ -372,6 +375,21 @@ const init = async () => {
           toolCard.href = tool.href;
           toolCard.className =
             'tool-card block bg-gray-800 rounded-xl p-4 cursor-pointer flex flex-col items-center justify-center text-center no-underline hover:shadow-lg transition duration-200';
+
+          // SPA navigation — intercept click and use router instead of full page load
+          toolCard.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Extract slug from href: e.g. "/merge-pdf.html" → "merge-pdf"
+            const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href') ?? '';
+            const slug = href.split('/').pop()?.replace('.html', '') ?? '';
+            if (slug) {
+              const homeContent = document.getElementById('home-content');
+              const viewEl = document.getElementById('view');
+              if (homeContent) homeContent.style.display = 'none';
+              if (viewEl) viewEl.classList.remove('hidden');
+              navigate(slug);
+            }
+          });
         } else {
           toolCard = document.createElement('div');
           toolCard.className =
@@ -424,6 +442,22 @@ const init = async () => {
     searchResultsContainer.className =
       'hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 col-span-full';
     dom.toolGrid.insertBefore(searchResultsContainer, dom.toolGrid.firstChild);
+
+    // Delegate SPA navigation for cloned search-result cards (cloneNode strips listeners)
+    searchResultsContainer.addEventListener('click', (e) => {
+      const card = (e.target as Element).closest('.tool-card');
+      if (!card || card.tagName !== 'A') return;
+      e.preventDefault();
+      const href = (card as HTMLAnchorElement).getAttribute('href') ?? '';
+      const slug = href.split('/').pop()?.replace('.html', '') ?? '';
+      if (slug) {
+        const homeContent = document.getElementById('home-content');
+        const viewEl = document.getElementById('view');
+        if (homeContent) homeContent.style.display = 'none';
+        if (viewEl) viewEl.classList.remove('hidden');
+        navigate(slug);
+      }
+    });
 
     searchBar.addEventListener('input', () => {
       // @ts-expect-error TS(2339) FIXME: Property 'value' does not exist on type 'HTMLEleme... Remove this comment to see the full error message
@@ -607,7 +641,7 @@ const init = async () => {
   ) as HTMLInputElement;
   const toolInterface = document.getElementById('tool-interface');
 
-  const savedFullWidth = localStorage.getItem('fullWidthMode') !== 'false';
+  const savedFullWidth = getPreference('fullWidthMode') !== 'false';
   if (fullWidthToggle) {
     fullWidthToggle.checked = savedFullWidth;
     applyFullWidthMode(savedFullWidth);
@@ -642,7 +676,7 @@ const init = async () => {
   if (fullWidthToggle) {
     fullWidthToggle.addEventListener('change', (e) => {
       const enabled = (e.target as HTMLInputElement).checked;
-      localStorage.setItem('fullWidthMode', enabled.toString());
+      setPreference('fullWidthMode', enabled.toString());
       applyFullWidthMode(enabled);
     });
   }
@@ -1158,6 +1192,24 @@ const init = async () => {
 
   // Rewrite links after all dynamic content is fully loaded
   rewriteLinks();
+
+  // Initialise the client-side router so hash-based navigation works on load
+  initRouter();
+
+  // Global keyboard shortcut: Ctrl+O / Cmd+O → open file dialog via native Tauri
+  window.addEventListener('keydown', async (e) => {
+    const isMac = navigator.userAgent.toUpperCase().includes('MAC');
+    if ((isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'o') {
+      // Only if a file-input drop zone is visible in the current view
+      const fileInput = document.querySelector(
+        '#view #file-input, #view #drop-zone input[type=file]'
+      ) as HTMLInputElement | null;
+      if (fileInput) {
+        e.preventDefault();
+        fileInput.click();
+      }
+    }
+  });
 };
 
 window.addEventListener('load', init);

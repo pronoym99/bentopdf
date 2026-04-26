@@ -6,6 +6,7 @@ import {
 import { initializeGlobalShortcuts } from '../utils/shortcuts-init.js';
 import { createIcons, icons } from 'lucide';
 import { loadPdfWithPasswordPrompt } from '../utils/password-prompt.js';
+import { getPreference } from '../tauri/preferences.js';
 
 let selectedFile: File | null = null;
 let viewerIframe: HTMLIFrameElement | null = null;
@@ -55,7 +56,7 @@ function resetState() {
     viewerContainer.style.aspectRatio = '';
   }
 
-  const isFullWidth = localStorage.getItem('fullWidthMode') !== 'false';
+  const isFullWidth = getPreference('fullWidthMode') !== 'false';
   if (toolUploader && !isFullWidth) {
     toolUploader.classList.remove('max-w-6xl');
     toolUploader.classList.add('max-w-2xl');
@@ -76,7 +77,7 @@ function updateFileList() {
   fileListDiv.innerHTML = '';
 
   // Expand container width for viewer if NOT in full width mode (default to true if not set)
-  const isFullWidth = localStorage.getItem('fullWidthMode') !== 'false';
+  const isFullWidth = getPreference('fullWidthMode') !== 'false';
   if (toolUploader && !isFullWidth) {
     toolUploader.classList.remove('max-w-2xl');
     toolUploader.classList.add('max-w-6xl');

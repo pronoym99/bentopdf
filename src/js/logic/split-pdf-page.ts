@@ -21,7 +21,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   let visualSelectorRendered = false;
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -661,4 +661,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) {
     processBtn.addEventListener('click', split);
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

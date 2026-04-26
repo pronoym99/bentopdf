@@ -796,7 +796,7 @@ async function handleFileInput(
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const backBtn = getElement<HTMLButtonElement>('back-to-tools');
 
   if (backBtn) {
@@ -1206,4 +1206,6 @@ document.addEventListener('DOMContentLoaded', function () {
   updateExportMenuForViewMode();
   syncComparePaneHeights();
   setViewMode(pageState.viewMode);
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

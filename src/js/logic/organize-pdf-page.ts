@@ -35,7 +35,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-function initializePage() {
+export function initializePage() {
   createIcons({ icons });
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -417,3 +417,5 @@ function resetState() {
   const fileDisplayArea = document.getElementById('file-display-area');
   if (fileDisplayArea) fileDisplayArea.innerHTML = '';
 }
+
+export const init = initializePage;

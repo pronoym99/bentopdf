@@ -282,7 +282,7 @@ function populateLanguageList() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+export function init(): void {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
   const processBtn = document.getElementById(
@@ -425,7 +425,9 @@ document.addEventListener('DOMContentLoaded', function () {
         'ocr-text-output'
       ) as HTMLTextAreaElement;
       if (textOutput) {
-        navigator.clipboard.writeText(textOutput.value).then(function () {
+        import('../tauri/clipboard.js').then(({ writeTextToClipboard }) =>
+          writeTextToClipboard(textOutput.value)
+        ).then(function () {
           copyBtn.innerHTML =
             '<i data-lucide="check" class="w-4 h-4 text-green-400"></i>';
           createIcons({ icons });
@@ -466,4 +468,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

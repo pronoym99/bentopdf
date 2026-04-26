@@ -49,14 +49,32 @@ import {
 let workflowEditor: WorkflowEditor | null = null;
 let selectedNodeId: string | null = null;
 let deleteNodeHandler: EventListener | null = null;
+let keydownHandler: EventListener | null = null;
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializePage);
-} else {
-  initializePage();
+// Auto-init only when loaded as a standalone page (not inside the SPA router,
+// which has a #view container and calls initializePage() explicitly).
+if (!document.getElementById('view')) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePage);
+  } else {
+    initializePage();
+  }
 }
 
-async function initializePage() {
+export async function initializePage(): Promise<void> {
+  // Destroy any previous editor instance (supports re-navigation in the SPA)
+  if (workflowEditor) {
+    workflowEditor.destroy();
+    workflowEditor = null;
+  }
+  selectedNodeId = null;
+
+  // Remove stale document-level listeners from any previous visit
+  if (keydownHandler) {
+    document.removeEventListener('keydown', keydownHandler);
+    keydownHandler = null;
+  }
+
   const container = document.getElementById('rete-container');
   if (!container) return;
 
@@ -136,8 +154,8 @@ async function initializePage() {
     showLoadTemplateModal(editor, area);
   });
 
-  document.getElementById('export-btn')?.addEventListener('click', () => {
-    exportWorkflow(editor, area);
+  document.getElementById('export-btn')?.addEventListener('click', async () => {
+    await exportWorkflow(editor, area);
   });
 
   document.getElementById('import-btn')?.addEventListener('click', async () => {
@@ -241,7 +259,7 @@ async function initializePage() {
     document.getElementById('settings-sidebar')?.classList.add('hidden');
   });
 
-  document.addEventListener('keydown', (e) => {
+  keydownHandler = ((e: KeyboardEvent) => {
     if (!selectedNodeId || !workflowEditor) return;
     if (e.key === 'Delete' || e.key === 'Backspace') {
       const tag = (e.target as HTMLElement).tagName;
@@ -249,7 +267,8 @@ async function initializePage() {
       e.preventDefault();
       deleteSelectedNode();
     }
-  });
+  }) as EventListener;
+  document.addEventListener('keydown', keydownHandler);
 
   if (deleteNodeHandler) {
     document.removeEventListener('wf-delete-node', deleteNodeHandler);
@@ -507,13 +526,79 @@ function buildToolbox() {
         }
       });
 
-      item.draggable = true;
-      item.addEventListener('dragstart', (e) => {
-        e.dataTransfer?.setData(
-          'application/rete-node-type',
-          item.dataset.type!
-        );
-        e.dataTransfer!.effectAllowed = 'copy';
+      // Pointer-event drag onto canvas.
+      // HTML5 drag-and-drop (dragstart/dragover/drop) is intercepted by
+      // Tauri's native window drag handler, which shows a "restricted" cursor.
+      // Using pointer capture avoids that native interception entirely.
+      let ptrGhost: HTMLElement | null = null;
+      let ptrMoved = false;
+
+      item.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        ptrMoved = false;
+        ptrGhost = document.createElement('div');
+        ptrGhost.className =
+          'fixed pointer-events-none z-[9999] bg-gray-800 border border-gray-600 ' +
+          'text-white text-xs px-2.5 py-1.5 rounded-lg shadow-xl flex items-center gap-1.5';
+        ptrGhost.style.display = 'none';
+        ptrGhost.innerHTML =
+          `<i class="ph ${entry.icon} text-sm text-indigo-400 flex-shrink-0"></i>` +
+          `<span>${entry.label}</span>`;
+        document.body.appendChild(ptrGhost);
+        item.setPointerCapture(e.pointerId);
+      });
+
+      item.addEventListener('pointermove', (e) => {
+        if (!ptrGhost || !item.hasPointerCapture(e.pointerId)) return;
+        if (!ptrMoved) {
+          ptrMoved = true;
+          ptrGhost.style.display = 'flex';
+        }
+        ptrGhost.style.left = `${e.clientX + 12}px`;
+        ptrGhost.style.top = `${e.clientY - 10}px`;
+      });
+
+      item.addEventListener('pointerup', (e) => {
+        if (!item.hasPointerCapture(e.pointerId)) return;
+        const wasDrag = ptrMoved;
+        const nodeType = item.dataset.type!;
+        ptrGhost?.remove();
+        ptrGhost = null;
+        ptrMoved = false;
+
+        if (!wasDrag || !workflowEditor) return;
+
+        // The browser fires a synthetic `click` after pointerup on the same
+        // element. Suppress it once so the click handler doesn't add a second
+        // node after we already placed one via the drag.
+        item.addEventListener('click', (ce) => ce.stopImmediatePropagation(), {
+          once: true,
+          capture: true,
+        });
+
+        const rc = document.getElementById('rete-container');
+        if (rc) {
+          const rect = rc.getBoundingClientRect();
+          if (
+            e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom
+          ) {
+            const { area } = workflowEditor;
+            const { x: tx, y: ty, k } = area.area.transform;
+            addNodeToCanvas(nodeType, {
+              x: (e.clientX - rect.left - tx) / k,
+              y: (e.clientY - rect.top - ty) / k,
+            });
+          }
+        }
+      });
+
+      item.addEventListener('lostpointercapture', () => {
+        ptrGhost?.remove();
+        ptrGhost = null;
+        ptrMoved = false;
       });
 
       itemsContainer.appendChild(item);
@@ -521,26 +606,6 @@ function buildToolbox() {
 
     section.appendChild(itemsContainer);
     container.appendChild(section);
-  }
-
-  const reteContainer = document.getElementById('rete-container');
-  if (reteContainer) {
-    reteContainer.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      e.dataTransfer!.dropEffect = 'copy';
-    });
-    reteContainer.addEventListener('drop', (e) => {
-      e.preventDefault();
-      const nodeType = e.dataTransfer?.getData('application/rete-node-type');
-      if (!nodeType || !workflowEditor) return;
-
-      const { area } = workflowEditor;
-      const rect = reteContainer.getBoundingClientRect();
-      const { x: tx, y: ty, k } = area.area.transform;
-      const x = (e.clientX - rect.left - tx) / k;
-      const y = (e.clientY - rect.top - ty) / k;
-      addNodeToCanvas(nodeType, { x, y });
-    });
   }
 }
 
@@ -1586,3 +1651,5 @@ function formatLabel(key: string): string {
     .replace(/^./, (c) => c.toUpperCase())
     .trim();
 }
+
+export const init = initializePage;

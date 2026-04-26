@@ -49,7 +49,7 @@ function resetCertState(): void {
     if (certInput) certInput.value = '';
 }
 
-function initializePage(): void {
+export function initializePage(): void {
     createIcons({ icons });
 
     const fileInput = getElement<HTMLInputElement>('file-input');
@@ -467,3 +467,5 @@ if (document.readyState === 'loading') {
 } else {
     initializePage();
 }
+
+export const init = initializePage;

@@ -8,7 +8,7 @@ import {
 } from '../utils/libreoffice-loader.js';
 import { deduplicateFileName } from '../utils/deduplicate-filename.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   state.files = [];
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -227,4 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   updateUI();
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

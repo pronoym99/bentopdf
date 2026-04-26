@@ -1,0 +1,8 @@
+# Rust build output
+target/
+
+# Dependency lockfile (auto-generated; not pinned for this binary crate)
+# Cargo.lock
+
+# Tauri-generated schemas and capability manifests
+gen/

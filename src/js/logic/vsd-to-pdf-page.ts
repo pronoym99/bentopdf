@@ -11,7 +11,7 @@ import { deduplicateFileName } from '../utils/deduplicate-filename.js';
 const ACCEPTED_EXTENSIONS = ['.vsd', '.vsdx'];
 const FILETYPE_NAME = 'VSD';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
   state.files = [];
 
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -183,4 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (processBtn) processBtn.addEventListener('click', convert);
 
   updateUI();
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);

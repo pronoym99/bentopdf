@@ -4,6 +4,7 @@ export {
   changeLanguage,
   applyTranslations,
   rewriteLinks,
+  getLanguage,
   getLanguageFromUrl,
   supportedLanguages,
   languageNames,

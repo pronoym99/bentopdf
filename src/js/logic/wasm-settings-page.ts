@@ -10,14 +10,16 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-function initializePage() {
+export function initializePage() {
   createIcons({ icons });
 
   document.querySelectorAll('.copy-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const url = btn.getAttribute('data-copy');
       if (url) {
-        await navigator.clipboard.writeText(url);
+        await import('../tauri/clipboard.js').then(({ writeTextToClipboard }) =>
+          writeTextToClipboard(url)
+        );
         const svg = btn.querySelector('svg');
         if (svg) {
           const checkIcon = document.createElement('i');
@@ -233,3 +235,5 @@ function initializePage() {
     );
   });
 }
+
+export const init = initializePage;

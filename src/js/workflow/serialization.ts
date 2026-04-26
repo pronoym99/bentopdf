@@ -10,6 +10,7 @@ import type {
   SerializedConnection,
 } from './types';
 import { WORKFLOW_VERSION } from './types';
+import { saveFile, openFiles } from '../tauri/fileIO';
 
 type AreaExtra = LitArea2D<ClassicScheme>;
 
@@ -205,58 +206,27 @@ export function deleteTemplate(name: string): void {
   localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
 }
 
-export function exportWorkflow(
+export async function exportWorkflow(
   editor: NodeEditor<ClassicScheme>,
   area: AreaPlugin<ClassicScheme, AreaExtra>
-): void {
+): Promise<void> {
   const data = serializeWorkflow(editor, area);
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'workflow.json';
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  await saveFile(blob, {
+    defaultName: 'workflow.json',
+    filters: [{ name: 'JSON', extensions: ['json'] }],
+  });
 }
 
 export async function importWorkflow(
   editor: NodeEditor<ClassicScheme>,
   area: AreaPlugin<ClassicScheme, AreaExtra>
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-
-    let settled = false;
-
-    input.onchange = async () => {
-      settled = true;
-      const file = input.files?.[0];
-      if (!file) {
-        resolve();
-        return;
-      }
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text) as SerializedWorkflow;
-        await deserializeWorkflow(data, editor, area);
-        resolve();
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
-        reject(new Error(`Failed to import workflow: ${message}`));
-      }
-    };
-
-    const onFocus = () => {
-      window.removeEventListener('focus', onFocus);
-      setTimeout(() => {
-        if (!settled) resolve();
-      }, 300);
-    };
-    window.addEventListener('focus', onFocus);
-
-    input.click();
-  });
+  const files = await openFiles({ accept: ['.json'], multiple: false });
+  if (!files.length) return;
+  const bytes = files[0].bytes;
+  const text = new TextDecoder().decode(bytes);
+  const data = JSON.parse(text) as SerializedWorkflow;
+  await deserializeWorkflow(data, editor, area);
 }

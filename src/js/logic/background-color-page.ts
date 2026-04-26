@@ -14,7 +14,7 @@ if (document.readyState === 'loading') {
   initializePage();
 }
 
-function initializePage() {
+export function initializePage() {
   createIcons({ icons });
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropZone = document.getElementById('drop-zone');
@@ -157,3 +157,5 @@ async function changeBackgroundColor() {
     hideLoader();
   }
 }
+
+export const init = initializePage;

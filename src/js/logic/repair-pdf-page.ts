@@ -2,7 +2,7 @@ import { repairPdf } from './repair-pdf.js';
 import { state } from '../state.js';
 import { renderFileDisplay } from '../ui.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+export function init(): void {
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
     const dropZone = document.getElementById('drop-zone');
     const processBtn = document.getElementById('process-btn');
@@ -89,4 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateUI();
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);
