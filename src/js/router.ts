@@ -11,6 +11,7 @@ import { createIcons, icons } from 'lucide';
 import { applyTranslations, rewriteLinks } from './i18n/index.js';
 import { resetState } from './state.js';
 import type { PageModule } from './types/router.js';
+import { initFullWidthMode } from './utils/full-width.js';
 
 // ---------------------------------------------------------------------------
 // Route table  (slug → dynamic import of page module)
@@ -222,6 +223,9 @@ export async function navigate(slug: string): Promise<void> {
 
     // Wire up the tool's event listeners
     await mod.init();
+
+    // Apply full-width preference to the freshly-injected tool uploader
+    initFullWidthMode();
 
     // Update window title
     const h1 = viewEl.querySelector('h1');
